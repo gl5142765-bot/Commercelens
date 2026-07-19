@@ -19,6 +19,27 @@ The goal is not to remove analysts completely. Instead, CommerceLens aims to han
 CommerceLens works on one known e‑commerce orders dataset. Instead of letting users upload arbitrary files, the project chooses a single domain and learns it deeply.
 Source: Kaggle (public dataset).
 Domain: e‑commerce orders and order items.
+## Data setup
+
+This project does not include the full database in GitHub because it is too large.
+
+Place your local database file inside the `data/` folder before running the app. If you only want to test the app quickly, you can use a small sample database or sample CSV instead.
+
+Example:
+
+```text
+commercelens/
+├── app/
+├── src/
+├── tests/
+├── data/
+│   └── commerce.db
+├── assets/
+├── notes/
+├── README.md
+├── requirements.txt
+└── config.toml
+```
 
 Example tables:
 
