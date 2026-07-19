@@ -1,0 +1,10 @@
+data/
+*.db
+*.sqlite
+*.sqlite3
+__pycache__/
+.venv/
+.env
+
+# Optional notebook artifacts
+.ipynb_checkpoints/
