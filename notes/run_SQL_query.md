@@ -1,0 +1,5 @@
+The run_sql_query step initially caused several problems because the SQL execution layer was being added while the project structure was still changing. At first, the function ignored the SQL and only returned sample orders data, so the result table did not match the generated query. 
+
+After that, once real SQL execution was connected, SQLite raised an error because the generated SQL sometimes had a trailing semicolon and the code was appending LIMIT directly, which made SQLite treat it like more than one statement. Another issue appeared when the function tried to return result rows before the rows variable had actually been created from cursor.fetchall(), which caused a Name Error.
+
+These problems were solved by properly connecting run_sql_query to the generated SQL, cleaning the SQL before execution, removing the trailing semicolon before adding LIMIT, fetching the query result correctly with cursor.fetchall(), and then converting the output into columns and JSON-friendly row dictionaries so FastAPI could return the response cleanly.
