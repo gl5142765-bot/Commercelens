@@ -157,6 +157,9 @@ streamlit run app/streamlit.py
 Then open the URL that Streamlit prints (usually `http://localhost:8501`).
 
 <img width="1183" height="832" alt="screen1" src="https://github.com/user-attachments/assets/9cab461a-8043-41b2-8b07-5de8f5dbbe00" />
+<img width="1787" height="863" alt="screen2" src="https://github.com/user-attachments/assets/4ab3ece1-0878-4426-ba9a-f5b740498fef" />
+<img width="1761" height="545" alt="screen3" src="https://github.com/user-attachments/assets/c2b67a7d-33eb-402b-a52e-499d8156d8af" />
+
 
 
 
