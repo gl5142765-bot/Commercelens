@@ -156,6 +156,10 @@ streamlit run app/streamlit.py
 
 Then open the URL that Streamlit prints (usually `http://localhost:8501`).
 
+<img width="1183" height="832" alt="screen1" src="https://github.com/user-attachments/assets/9cab461a-8043-41b2-8b07-5de8f5dbbe00" />
+
+
+
 ### 4.3 Typical flow for a user
 
 1. Open the Streamlit app.
