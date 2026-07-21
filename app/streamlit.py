@@ -3,7 +3,7 @@ import requests
 import pandas as pd
 from pathlib import Path
 
-BACKEND_URL = "http://127.0.0.1:8000/ask"
+BACKEND_URL = "https://commercelens-backend-1.onrender.com"
 
 st.set_page_config(page_title="CommerceLens", layout="wide")
 
