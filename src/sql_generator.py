@@ -5,8 +5,20 @@ from dotenv import load_dotenv
 
 from src.prompt_builder import build_prompt, normalize_sql_for_sqlite
 
-BASE_DIR = Path(__file__).resolve().parent.parent
-load_dotenv(BASE_DIR / ".env")
+DATA_DIR = Path(__file__).resolve().parent.parent / "data"
+DATA_DIR.mkdir(parents=True, exist_ok=True)
+
+def download_from_storj():
+    s3 = boto3.client(
+        "s3",
+        endpoint_url=os.getenv("STORJ_ENDPOINT"),
+        aws_access_key_id=os.getenv("STORJ_ACCESS_KEY"),
+        aws_secret_access_key=os.getenv("STORJ_SECRET_KEY"),
+    )
+
+    bucket = os.getenv("STORJ_BUCKET")
+    for name in ["orders.csv", "order_items.csv", "products.csv", "users.csv"]:
+        s3.download_file(bucket, name, str(DATA_DIR / name))
 
 OPENAI_API_KEY = os.getenv("OPENAI_API_KEY", "").strip()
 LLM_MODEL_NAME = os.getenv("LLM_MODEL_NAME", "gpt-4o-mini").strip()
