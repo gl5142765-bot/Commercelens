@@ -1,21 +1,26 @@
 import sqlite3
 import pandas as pd
-from src.config import DATA_DIR, DB_PATH
-import re
+from src.config import ORDERS_CSV, ORDER_ITEMS_CSV, PRODUCTS_CSV, USERS_CSV
 
 def init_db():
-    conn = sqlite3.connect(DB_PATH)
-    try:
-        orders_df = pd.read_csv(DATA_DIR / "orders.csv")
-        orders_df.to_sql("orders", conn, if_exists="replace", index=False)
+    return _build_connection()
 
-        order_items_df = pd.read_csv(DATA_DIR / "order_items.csv")
-        order_items_df.to_sql("order_items", conn, if_exists="replace", index=False)
-    finally:
-        conn.close()
+def _build_connection():
+    conn = sqlite3.connect(":memory:")
+
+    if USERS_CSV.exists():
+        pd.read_csv(USERS_CSV).to_sql("users", conn, if_exists="replace", index=False)
+    if PRODUCTS_CSV.exists():
+        pd.read_csv(PRODUCTS_CSV).to_sql("products", conn, if_exists="replace", index=False)
+    if ORDERS_CSV.exists():
+        pd.read_csv(ORDERS_CSV).to_sql("orders", conn, if_exists="replace", index=False)
+    if ORDER_ITEMS_CSV.exists():
+        pd.read_csv(ORDER_ITEMS_CSV).to_sql("order_items", conn, if_exists="replace", index=False)
+
+    return conn
 
 def run_sql_query(sql: str, limit: int = 100) -> dict:
-    conn = sqlite3.connect(DB_PATH)
+    conn = _build_connection()
     conn.row_factory = sqlite3.Row
     cursor = conn.cursor()
     try:
@@ -23,7 +28,7 @@ def run_sql_query(sql: str, limit: int = 100) -> dict:
         if not clean_sql:
             raise ValueError("Empty SQL query.")
 
-        has_limit = bool(re.search(r"\bLIMIT\b", clean_sql, flags=re.IGNORECASE))
+        has_limit = " limit " in clean_sql.lower()
         sql_to_execute = clean_sql if has_limit else f"{clean_sql} LIMIT {limit}"
 
         cursor.execute(sql_to_execute)
