@@ -117,10 +117,11 @@ def main():
             with st.spinner("Thinking..."):
                 try:
                     payload = {"question": question}
-                    response = requests.post(BACKEND_URL, json=payload)
+                    response = requests.post(f"{BACKEND_URL}/ask", json=payload, timeout=60)
 
                     if response.status_code != 200:
-                        st.error(f"Backend error: {response.status_code}")
+                       st.error(f"Backend error: {response.status_code}")
+                       st.code(response.text)
                     else:
                         data = response.json()
                         sql = data.get("sql", "")
