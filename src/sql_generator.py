@@ -1,10 +1,12 @@
+from pathlib import Path
 import os
 import requests
 from dotenv import load_dotenv
 
 from src.prompt_builder import build_prompt, normalize_sql_for_sqlite
 
-load_dotenv()
+BASE_DIR = Path(__file__).resolve().parent.parent
+load_dotenv(BASE_DIR / ".env")
 
 OPENAI_API_KEY = os.getenv("OPENAI_API_KEY", "").strip()
 LLM_MODEL_NAME = os.getenv("LLM_MODEL_NAME", "gpt-4o-mini").strip()
@@ -15,7 +17,7 @@ FORBIDDEN_KEYWORDS = ["drop", "truncate", "alter", "delete", "update", "insert"]
 
 def call_llm(prompt: str) -> str:
     if not OPENAI_API_KEY:
-        raise ValueError("OPENAI_API_KEY is missing. Check your .env file.")
+        raise ValueError("OPENAI_API_KEY is missing. Check the .env file in the project root.")
 
     headers = {
         "Authorization": f"Bearer {OPENAI_API_KEY}",
@@ -44,13 +46,10 @@ def clean_sql(raw_text: str) -> str:
 
 def validate_sql(sql: str) -> bool:
     cleaned = sql.strip().lower()
-
     if not cleaned.startswith("select"):
         return False
-
     if any(word in cleaned for word in FORBIDDEN_KEYWORDS):
         return False
-
     return True
 
 def generate_sql_from_question(user_question: str) -> str:
