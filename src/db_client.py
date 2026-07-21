@@ -1,19 +1,14 @@
-import pandas as pd
-from src.config import ORDERS_CSV
+from pathlib import Path
+import os
+from dotenv import load_dotenv
 
+BASE_DIR = Path(__file__).resolve().parent.parent
+DATA_DIR = BASE_DIR / "data"
+DB_PATH = BASE_DIR / "commerce.db"
 
-def get_orders_df():
-    return pd.read_csv(ORDERS_CSV)
+load_dotenv()
 
-
-def answer_question(question: str):
-    # 1. Generate SQL from the question
-    sql = generate_sql_from_question(question)
-    sql = clean_sql(sql)
-    validate_sql(sql)
-
-    # 2. Run that SQL
-    columns, rows = run_sql_query(sql)
-
-    # 3. Return or render result
-    return sql, columns, rows
+ORDERS_CSV = DATA_DIR / "orders.csv"
+ORDER_ITEMS_CSV = DATA_DIR / "order_items.csv"
+PRODUCTS_CSV = DATA_DIR / "products.csv"
+USERS_CSV = DATA_DIR / "users.csv"
