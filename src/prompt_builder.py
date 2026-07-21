@@ -1,7 +1,5 @@
-# src/prompt_builder.py
-
 PROMPT_TEMPLATE = """
-You are an expert SQL assistant for the CommerceLens e-commerce dataset.
+You are an expert SQL assistant for the CommerceLens dataset.
 
 Generate SQL for SQLite only.
 
@@ -10,15 +8,11 @@ Follow the metric definitions exactly.
 Return SQL only.
 
 Schema:
-- users
-- products
 - orders
 - order_items
 
 Relationships:
-- users.id = orders.user_id
 - orders.order_id = order_items.order_id
-- products.id = order_items.product_id
 
 Metric definitions:
 - Total revenue = sum of sale_price
