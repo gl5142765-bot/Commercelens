@@ -1,25 +1,20 @@
 from fastapi import FastAPI, HTTPException
 from pydantic import BaseModel
+import logging
 
-from src.sql_runner import init_db, run_sql_query
+from src.sql_runner import run_sql_query
 from src.sql_generator import generate_sql_from_question, clean_sql, validate_sql
 
-
 app = FastAPI()
-
-import logging
 
 logging.basicConfig(
     level=logging.INFO,
     format="%(asctime)s | %(levelname)s | %(message)s"
 )
-
 logger = logging.getLogger(__name__)
-
 
 class QuestionPayload(BaseModel):
     question: str
-
 
 def generate_business_note(question: str, columns: list[str], rows: list[dict]) -> str:
     if not rows:
@@ -42,7 +37,6 @@ def generate_business_note(question: str, columns: list[str], rows: list[dict]) 
         return f"This result compares {first_col.replace('_', ' ')} against {second_col.replace('_', ' ')}."
 
     return "The query returned multiple rows of results."
-
 
 def answer_question(question: str):
     logger.info(f"Question received: {question}")
@@ -69,7 +63,6 @@ def answer_question(question: str):
     logger.info(f"Business note: {note}")
 
     return {
-
         "sql": query_result.get("sql_executed", sql),
         "columns": columns,
         "rows": rows,
@@ -78,22 +71,9 @@ def answer_question(question: str):
         "note": note,
     }
 
-
-@app.on_event("startup")
-def startup_event():
-    init_db()
-
-
 @app.get("/health")
 def health_check():
     return {"status": "ok"}
-
-
-@app.get("/test-orders")
-def test_orders():
-    df = get_orders_df()
-    return {"order_count": int(len(df))}
-
 
 @app.post("/generate-sql")
 def generate_sql_endpoint(payload: QuestionPayload):
@@ -104,7 +84,6 @@ def generate_sql_endpoint(payload: QuestionPayload):
         raise HTTPException(status_code=400, detail="Generated SQL failed validation.")
 
     return {"sql": sql}
-
 
 @app.post("/ask")
 def ask_endpoint(payload: QuestionPayload):
