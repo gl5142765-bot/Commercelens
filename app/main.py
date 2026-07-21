@@ -11,6 +11,12 @@ import os
 load_dotenv()
 OPENAI_API_KEY = os.getenv("OPENAI_API_KEY")
 
+
+STORJ_ACCESS_KEY = os.getenv("STORJ_ACCESS_KEY")
+STORJ_SECRET_KEY = os.getenv("STORJ_SECRET_KEY")
+STORJ_ENDPOINT = os.getenv("STORJ_ENDPOINT")
+STORJ_BUCKET = os.getenv("STORJ_BUCKET")
+
 app = FastAPI()
 
 logging.basicConfig(
