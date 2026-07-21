@@ -71,9 +71,9 @@ def answer_question(question: str):
         "note": note,
     }
 
-@app.get("/health")
-def health_check():
-    return {"status": "ok"}
+@app.get("/")
+def root():
+    return {"message": "CommerceLens API is running"}
 
 @app.post("/generate-sql")
 def generate_sql_endpoint(payload: QuestionPayload):
