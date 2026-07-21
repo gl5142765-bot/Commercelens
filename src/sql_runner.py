@@ -1,21 +1,21 @@
 import sqlite3
 import pandas as pd
 import re
-
 from src.config import ORDERS_CSV, ORDER_ITEMS_CSV, PRODUCTS_CSV, USERS_CSV
+
+def _load_csv_or_raise(path, table_name):
+    if not path.exists():
+        raise FileNotFoundError(f"Missing required file for table '{table_name}': {path}")
+    return pd.read_csv(path)
 
 def _build_connection():
     conn = sqlite3.connect(":memory:")
     conn.row_factory = sqlite3.Row
 
-    if USERS_CSV.exists():
-        pd.read_csv(USERS_CSV).to_sql("users", conn, if_exists="replace", index=False)
-    if PRODUCTS_CSV.exists():
-        pd.read_csv(PRODUCTS_CSV).to_sql("products", conn, if_exists="replace", index=False)
-    if ORDERS_CSV.exists():
-        pd.read_csv(ORDERS_CSV).to_sql("orders", conn, if_exists="replace", index=False)
-    if ORDER_ITEMS_CSV.exists():
-        pd.read_csv(ORDER_ITEMS_CSV).to_sql("order_items", conn, if_exists="replace", index=False)
+    _load_csv_or_raise(USERS_CSV, "users").to_sql("users", conn, if_exists="replace", index=False)
+    _load_csv_or_raise(PRODUCTS_CSV, "products").to_sql("products", conn, if_exists="replace", index=False)
+    _load_csv_or_raise(ORDERS_CSV, "orders").to_sql("orders", conn, if_exists="replace", index=False)
+    _load_csv_or_raise(ORDER_ITEMS_CSV, "order_items").to_sql("order_items", conn, if_exists="replace", index=False)
 
     return conn
 
@@ -25,7 +25,6 @@ def init_db():
 def run_sql_query(sql: str, limit: int = 100) -> dict:
     conn = _build_connection()
     cursor = conn.cursor()
-
     try:
         clean_sql = sql.strip().rstrip(";")
         if not clean_sql:
