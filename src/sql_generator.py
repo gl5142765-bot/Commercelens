@@ -2,7 +2,7 @@
 
 import requests
 from src.config import OPENAI_API_KEY, LLM_MODEL_NAME, LLM_BASE_URL
-from src.prompt_builder import build_prompt, normalize_sql_for_sqlite
+from src.prompt_builder import build_prompt, normalize_sql_for_sqlite, clean_sql
 
 ALLOWED_TABLES = ["orders", "order_items"]
 FORBIDDEN_KEYWORDS = ["drop", "truncate", "alter", "delete", "update", "insert"]
