@@ -1,16 +1,22 @@
 import os
-import re
 import requests
+from dotenv import load_dotenv
+
 from src.prompt_builder import build_prompt, normalize_sql_for_sqlite
 
-OPENAI_API_KEY = os.getenv("OPENAI_API_KEY", "")
-LLM_MODEL_NAME = os.getenv("LLM_MODEL_NAME", "gpt-4o-mini")
-LLM_BASE_URL = os.getenv("LLM_BASE_URL", "https://api.openai.com/v1/chat/completions")
+load_dotenv()
+
+OPENAI_API_KEY = os.getenv("OPENAI_API_KEY", "").strip()
+LLM_MODEL_NAME = os.getenv("LLM_MODEL_NAME", "gpt-4o-mini").strip()
+LLM_BASE_URL = os.getenv("LLM_BASE_URL", "https://api.openai.com/v1/chat/completions").strip()
 
 ALLOWED_TABLES = ["orders", "order_items"]
 FORBIDDEN_KEYWORDS = ["drop", "truncate", "alter", "delete", "update", "insert"]
 
 def call_llm(prompt: str) -> str:
+    if not OPENAI_API_KEY:
+        raise ValueError("OPENAI_API_KEY is missing. Check your .env file.")
+
     headers = {
         "Authorization": f"Bearer {OPENAI_API_KEY}",
         "Content-Type": "application/json",
