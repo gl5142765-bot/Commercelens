@@ -85,6 +85,11 @@ def generate_sql_endpoint(payload: QuestionPayload):
 
     return {"sql": sql}
 
+from fastapi import HTTPException
+
 @app.post("/ask")
 def ask_endpoint(payload: QuestionPayload):
-    return answer_question(payload.question)
+    try:
+        return answer_question(payload.question)
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
