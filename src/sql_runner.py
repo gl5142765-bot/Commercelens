@@ -12,8 +12,11 @@ def _build_connection():
     conn = sqlite3.connect(":memory:")
     conn.row_factory = sqlite3.Row
 
-    _load_csv_or_raise(ORDERS_CSV, "orders").to_sql("orders", conn, if_exists="replace", index=False)
-    _load_csv_or_raise(ORDER_ITEMS_CSV, "order_items").to_sql("order_items", conn, if_exists="replace", index=False)
+    orders_df = _load_csv_or_raise(ORDERS_CSV, "orders")
+    order_items_df = _load_csv_or_raise(ORDER_ITEMS_CSV, "order_items")
+
+    orders_df.to_sql("orders", conn, if_exists="replace", index=False)
+    order_items_df.to_sql("order_items", conn, if_exists="replace", index=False)
 
     return conn
 
