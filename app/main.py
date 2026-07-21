@@ -1,9 +1,9 @@
 from fastapi import FastAPI, HTTPException
 from pydantic import BaseModel
 
-from src.db_client import get_orders_df
-from src.sql_generator import generate_sql_from_question, clean_sql, validate_sql
 from src.sql_runner import init_db, run_sql_query
+from src.sql_generator import generate_sql_from_question, clean_sql, validate_sql
+
 
 app = FastAPI()
 
