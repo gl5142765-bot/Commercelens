@@ -5,6 +5,12 @@ import logging
 from src.sql_runner import run_sql_query
 from src.sql_generator import generate_sql_from_question, clean_sql, validate_sql
 
+from dotenv import load_dotenv
+import os
+
+load_dotenv()
+OPENAI_API_KEY = os.getenv("OPENAI_API_KEY")
+
 app = FastAPI()
 
 logging.basicConfig(
@@ -85,7 +91,6 @@ def generate_sql_endpoint(payload: QuestionPayload):
 
     return {"sql": sql}
 
-from fastapi import HTTPException
 
 @app.post("/ask")
 def ask_endpoint(payload: QuestionPayload):
