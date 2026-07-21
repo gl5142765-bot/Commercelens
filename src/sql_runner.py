@@ -1,7 +1,7 @@
 import sqlite3
 import pandas as pd
 import re
-from src.config import ORDERS_CSV, ORDER_ITEMS_CSV, PRODUCTS_CSV, USERS_CSV
+from src.config import ORDERS_CSV, ORDER_ITEMS_CSV
 
 def _load_csv_or_raise(path, table_name):
     if not path.exists():
@@ -12,8 +12,6 @@ def _build_connection():
     conn = sqlite3.connect(":memory:")
     conn.row_factory = sqlite3.Row
 
-    _load_csv_or_raise(USERS_CSV, "users").to_sql("users", conn, if_exists="replace", index=False)
-    _load_csv_or_raise(PRODUCTS_CSV, "products").to_sql("products", conn, if_exists="replace", index=False)
     _load_csv_or_raise(ORDERS_CSV, "orders").to_sql("orders", conn, if_exists="replace", index=False)
     _load_csv_or_raise(ORDER_ITEMS_CSV, "order_items").to_sql("order_items", conn, if_exists="replace", index=False)
 
