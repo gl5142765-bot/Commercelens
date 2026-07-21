@@ -1,12 +1,12 @@
 import sqlite3
 import pandas as pd
-from src.config import ORDERS_CSV, ORDER_ITEMS_CSV, PRODUCTS_CSV, USERS_CSV
+import re
 
-def init_db():
-    return _build_connection()
+from src.config import ORDERS_CSV, ORDER_ITEMS_CSV, PRODUCTS_CSV, USERS_CSV
 
 def _build_connection():
     conn = sqlite3.connect(":memory:")
+    conn.row_factory = sqlite3.Row
 
     if USERS_CSV.exists():
         pd.read_csv(USERS_CSV).to_sql("users", conn, if_exists="replace", index=False)
@@ -19,16 +19,19 @@ def _build_connection():
 
     return conn
 
+def init_db():
+    return None
+
 def run_sql_query(sql: str, limit: int = 100) -> dict:
     conn = _build_connection()
-    conn.row_factory = sqlite3.Row
     cursor = conn.cursor()
+
     try:
         clean_sql = sql.strip().rstrip(";")
         if not clean_sql:
             raise ValueError("Empty SQL query.")
 
-        has_limit = " limit " in clean_sql.lower()
+        has_limit = bool(re.search(r"\bLIMIT\b", clean_sql, flags=re.IGNORECASE))
         sql_to_execute = clean_sql if has_limit else f"{clean_sql} LIMIT {limit}"
 
         cursor.execute(sql_to_execute)
