@@ -185,6 +185,12 @@ Example response shape:
 }
 ```
 
+<img width="1183" height="832" alt="screen1" src="https://github.com/user-attachments/assets/85adfe3f-6794-4be7-ae29-a18519055898" />
+<img width="1787" height="863" alt="screen2" src="https://github.com/user-attachments/assets/6f2705ca-6ae1-4f17-99ac-1258c38d1a32" />
+<img width="1761" height="545" alt="screen3" src="https://github.com/user-attachments/assets/bb7ea8e8-3c13-4e23-93f1-a3b341558280" />
+
+
+
 ### 5.2 Start the frontend (Streamlit)
 
 In a second terminal, again from the project root:
