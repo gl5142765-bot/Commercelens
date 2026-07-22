@@ -1,81 +1,129 @@
 # CommerceLens
-CommerceLens is a domain‑focused Text‑to‑SQL analytics assistant for a known e‑commerce dataset. Its purpose is to let a business user ask questions in plain English about a fixed orders dataset and receive a generated SQL query, result table, chart, and short explanation in return.
 
-## 1. Quick overview 
+CommerceLens is a domain‑focused Text‑to‑SQL analytics assistant for a known e‑commerce dataset.  
+It lets a business user ask questions in plain English about a fixed orders dataset and returns a generated SQL query, result table, chart, and short explanation.
 
-**What it is**
+---
 
-Text‑to‑SQL means converting natural‑language questions into SQL queries that can be executed on a relational database. SQL (Structured Query Language) is the standard language used to work with relational databases, where data is stored in structured tables made of rows and columns.
-For this project, CommerceLens is built on a fixed, domain‑specific schema rather than an open “upload anything” workflow. The system knows the exact tables, columns, and relationships in advance. This decision improves accuracy, prompting clarity, validation, and explainability because every question is asked against a known business dataset.
-A helpful way to think about this is the restaurant owner and chef analogy:
+## 1. Quick overview
 
-The business stakeholder (restaurant owner) knows the business very well: which products sell, which periods are busiest, and which metrics matter for decisions.
-The analyst (chef) knows how to use SQL and the database to answer those questions.
-Text‑to‑SQL focuses on the translation step in the middle. It reduces the dependency on manual back‑and‑forth between business questions and database queries, so simple and repeated data access becomes faster.
-The goal is not to remove analysts completely. Instead, CommerceLens aims to handle the routine question‑to‑SQL translation so analysts can spend more time on higher‑value analysis, validation, and deeper modelling.
+### 1.1 What Text‑to‑SQL means
 
+Text‑to‑SQL means converting natural‑language questions into SQL queries that can be executed on a relational database.  
+SQL (Structured Query Language) is the standard language for working with relational databases, where data is stored in structured tables made of rows and columns [web:670][web:679].
 
-**Dataset used**
-CommerceLens works on one known e‑commerce orders dataset. Instead of letting users upload arbitrary files, the project chooses a single domain and learns it deeply.
-Source: Kaggle (public dataset).
-Domain: e‑commerce orders and order items.
-## Data setup
+CommerceLens is built on a **fixed, domain‑specific schema** instead of an open “upload anything” workflow:
 
-This project does not include the full database in GitHub because it is too large.
+- The system knows the exact tables, columns, and relationships in advance.
+- Every question is asked against this known business dataset.
+- This improves accuracy, validation, and explainability, because the model is always operating inside a defined schema [web:670][web:681].
 
-Place your local database file inside the `data/` folder before running the app. If you only want to test the app quickly, you can use a small sample database or sample CSV instead.
+The goal is not to remove analysts. Instead, CommerceLens handles routine question‑to‑SQL translation so analysts can spend more time on deeper analysis and interpretation.
 
-Example:
+### 1.2 Dataset used
+
+CommerceLens works on a single public e‑commerce orders dataset:
+
+- Source: Kaggle (public dataset)
+- Domain: orders, order items, and basic customer and product information
+- Tables used in this version:
+  - `orders` – order‑level facts such as order id, order date, customer id, and order status
+  - `order_items` – line‑item details such as product id, quantity, and sale price
+
+The dataset is imported into a local SQLite database or CSVs, and all questions in v1 are framed around core metrics such as:
+
+- revenue and order volume over time
+- average order value
+- top products or categories
+- simple cohort‑style views (by month, by status, etc.)
+
+---
+
+## 2. Data setup
+
+### 2.1 Files required
+
+This repo includes four CSV files under `data/`:
+
+```text
+data/
+├── orders.csv
+├── order_items.csv
+├── products.csv
+└── users.csv
+```
+
+These are the inputs used to build the internal SQLite database at runtime.  
+The backend expects these files to be present before the app starts.
+
+If you want to plug in your own data:
+
+1. Keep the same column names and structure where possible.
+2. Replace the CSVs in `data/`.
+3. Restart the backend so it reloads the data into SQLite.
+
+### 2.2 Example project layout
 
 ```text
 commercelens/
 ├── app/
+│   └── streamlit.py         # Streamlit frontend
 ├── src/
-├── tests/
+│   ├── config.py            # App configuration
+│   ├── db_client.py         # Load CSVs / DB init
+│   ├── prompt_builder.py    # System + user prompt templates
+│   ├── sql_generator.py     # Turn questions into SQL strings
+│   ├── sql_runner.py        # Run SQL against SQLite
+│   └── ...
 ├── data/
-│   └── commerce.db
+│   ├── orders.csv
+│   ├── order_items.csv
+│   ├── products.csv
+│   └── users.csv
 ├── assets/
-├── notes/
-├── README.md
+│   ├── screen1.jpg          # UI screenshots
+│   ├── screen2.jpg
+│   └── screen3.jpg
+├── tests/
+├── .streamlit/
+│   └── config.toml          # Streamlit theme
 ├── requirements.txt
-└── config.toml
+└── README.md
 ```
 
-Example tables:
+---
 
-orders: order‑level data such as order id, order date, customer id.
-order_items: line‑item data such as product, quantity, and sale price.
-The dataset is imported into a local SQLite database (for example, data/orders.db). CommerceLens expects this schema and uses it to:
+## 3. Stack and features
 
-generate SQL that references the correct tables and columns,
+### 3.1 Tech stack
 
-validate queries before running them,
-and produce results that are easy to explain back to the business user.
-All questions during the first version are framed around this known dataset: trends over time, revenue, order volume, average order value, top products, and similar e‑commerce metrics.
+- **Backend**: FastAPI (Python)
+- **Frontend**: Streamlit
+- **Data**: SQLite database built from the CSVs in `data/`
+- **Python libraries**: `pandas`, `requests`, `pydantic`, `python-dotenv`, plus standard `sqlite3` [web:671][web:684]
 
-**Stack**
+### 3.2 Main features
 
-- Backend: FastAPI (Python)
-- Frontend: Streamlit
-- Data: SQLite database (orders + order_items tables)
-- Python libraries: `pandas`, `requests`, `pydantic`
+- Generate SQL from a natural‑language business question
+- Validate and run SQL against the local SQLite database
+- Return:
+  - the generated SQL,
+  - the result table,
+  - an auto‑selected chart (line or bar),
+  - and a short, deterministic business note describing the result
+- Provide example questions for “one‑click” exploration
 
-**Main features**
+---
 
-- Generate SQL from a business question.
-- Validate and run the SQL against the local SQLite database.
-- Show the result as a table and auto-select a basic chart when useful.
-- Display a short business note summarising the result.
+## 4. Requirements and installation
 
-## 2. Requirements and installation
+### 4.1 Python version
 
-### 2.1 Python version
+- Python 3.11+ (tested primarily on 3.11)
 
-- Python 3.11+ (3.10 also works, but the project was tested with 3.11).
+### 4.2 Dependencies
 
-### 2.2 requirements.txt
-
-Add this file at the project root:
+`requirements.txt` at the repo root:
 
 ```text
 fastapi
@@ -87,167 +135,149 @@ requests
 python-dotenv
 ```
 
-If your SQLite database is local, the built‑in `sqlite3` module is enough; no extra dependency is required.
-
-### 2.3 Install dependencies
-
-From the project root:
+Install these from the project root:
 
 ```bash
 python -m venv .venv
-source .venv/bin/activate   # Windows: .venv\Scripts\activate
+# Linux / macOS
+source .venv/bin/activate
+# Windows (PowerShell)
+# .venv\Scripts\Activate.ps1
+
 pip install -r requirements.txt
 ```
 
-## 3. Project structure
+---
 
-A clean first version of the repository can look like this:
+## 5. Running the app locally
 
-```text
-commercelens/
-├── app/
-│   └── streamlit.py           # Streamlit frontend
-├── backend/
-│   ├── main.py                # FastAPI entrypoint
-│   ├── src/
-│   │   ├── db_client.py       # Load orders dataframe / DB init
-│   │   ├── sql_generator.py   # Turn questions into SQL strings
-│   │   ├── sql_runner.py      # Run SQL against SQLite
-│   │   └── models.py          # Pydantic models (optional)
-├── data/
-│   └── orders.db              # SQLite database
-├── assets/
-│   ├── screen1.jpg            # UI screenshots for README/UI
-│   ├── screen2.jpg
-│   └── screen3.jpg
-├── .streamlit/
-│   └── config.toml            # Theme (colours, accent)
-├── requirements.txt
-└── README.md
-```
-
-You can adjust module names, but try to keep this separation:
-
-- `backend/` for API and data logic.
-- `app/` for everything Streamlit.
-- `data/` for the local database.
-- `assets/` for screenshots and logos.
-
-## 4. How to run locally (step‑by‑step)
-
-### 4.1 Start the backend (FastAPI)
+### 5.1 Start the backend (FastAPI)
 
 From the project root:
 
 ```bash
-uvicorn backend.main:app --reload --port 8000
+uvicorn src.main:app --reload --port 8000
 ```
 
-This command starts the FastAPI app on `http://127.0.0.1:8000`. The `/ask` endpoint accepts a JSON payload of the form:
+- The app listens on `http://127.0.0.1:8000`.
+- The main endpoint is `POST /ask`.
+
+Example request body:
 
 ```json
 {
-  "question": "How has the order count changed over time?"
+  "question": "How has revenue changed over time?"
 }
 ```
 
-The backend returns a JSON object with:
+Example response shape:
 
 ```json
 {
   "sql": "SELECT ...",
-  "columns": ["month", "order_count"],
+  "columns": ["month", "revenue"],
   "rows": [
-    {"month": "2022-01", "order_count": 120},
-    {"month": "2022-02", "order_count": 130}
+    {"month": "2022-01", "revenue": 162029.34}
   ],
-  "row_count": 2,
-  "display_type": "table",
-  "note": "This result shows how order count changes across months."
+  "row_count": 12,
+  "display_type": "line",
+  "note": "This shows monthly revenue over the selected period."
 }
 ```
 
-### 4.2 Start the frontend (Streamlit)
+### 5.2 Start the frontend (Streamlit)
 
-In a second terminal, still in the project root:
+In a second terminal, again from the project root:
 
 ```bash
 streamlit run app/streamlit.py
 ```
 
-Then open the URL that Streamlit prints (usually `http://localhost:8501`).
+Open the URL printed in the terminal (usually `http://localhost:8501`).
 
-<img width="1183" height="832" alt="screen1" src="https://github.com/user-attachments/assets/9cab461a-8043-41b2-8b07-5de8f5dbbe00" />
-<img width="1787" height="863" alt="screen2" src="https://github.com/user-attachments/assets/4ab3ece1-0878-4426-ba9a-f5b740498fef" />
-<img width="1761" height="545" alt="screen3" src="https://github.com/user-attachments/assets/c2b67a7d-33eb-402b-a52e-499d8156d8af" />
+The UI allows you to:
 
+- Pick an example question or type your own.
+- Send it to the backend.
+- View the generated SQL, result table, and chart.
+- Read a short business‑friendly interpretation.
 
+Screenshots:
 
+> include the three `assets/screen*.jpg` screenshots here as images in the README if you like.
 
-### 4.3 Typical flow for a user
+### 5.3 Typical user flow
 
 1. Open the Streamlit app.
-2. Choose an example question or type a custom business question.
+2. Choose a sample question (e.g., “How has revenue changed over time?”).
 3. Click **Ask CommerceLens**.
 4. Wait while the backend generates SQL and runs it.
-5. View the business note, SQL, data table, and chart.
+5. Inspect:
+   - the business note,
+   - the SQL (in the expander),
+   - the table and chart.
 
-## 5. Architecture overview (detailed version)
+---
 
-### 5.1 High‑level flow
+## 6. Architecture overview
+
+### 6.1 High‑level flow
 
 1. **User question (Streamlit)**  
-   The user types a question in the Streamlit UI and clicks the button.
+   The user submits a question through the Streamlit UI.
 
 2. **Frontend → Backend call**  
-   Streamlit sends `{"question": "..."}` to `POST /ask` on the FastAPI backend using `requests.post`.
+   Streamlit calls `POST /ask` on the FastAPI backend with a JSON payload containing the question.
 
 3. **SQL generation**  
-   `sql_generator.generate_sql_from_question(question)` produces a raw SQL string for the orders dataset.  
-   `clean_sql()` and `validate_sql()` ensure the query is safe and usable.
+   `sql_generator` turns the question into a SQL string for the known orders schema.  
+   `prompt_builder` helps constrain the model and keep SQL on the allowed tables and columns.
 
 4. **Query execution**  
-   `sql_runner.run_sql_query(sql)` runs the SQL against the local SQLite database and returns `columns`, `rows`, and the final SQL.
+   `sql_runner` runs the SQL against the SQLite database built from the CSVs and returns:
+   - `columns`
+   - `rows`
+   - `row_count`
+   - `display_type` suggestions
 
 5. **Business note**  
-   `generate_business_note(question, columns, rows)` builds a short, deterministic summary from the result (single value, trend, or comparison).
+   A summariser builds a short, deterministic note describing trends or comparisons.
 
 6. **Backend response**  
-   FastAPI returns a JSON payload containing SQL, columns, rows, `display_type`, and `note`.
+   FastAPI returns a JSON object containing SQL, data, and presentation hints.
 
 7. **Frontend rendering**  
    Streamlit:
-   - shows the note in the **Result** card,  
-   - wraps SQL in an expander,  
-   - builds a `pandas.DataFrame` for the table,  
-   - auto‑selects either a line chart or bar chart based on the first two columns and the `display_type`.
+   - shows the note in a result card,
+   - wraps SQL in a “View SQL” expander,
+   - converts data to a `pandas.DataFrame`,
+   - chooses a line or bar chart based on the result structure.
 
-### 5.2 Key modules
+### 6.2 Key modules
 
-- `db_client.py`  
-  - Initialises the SQLite database (if needed).  
-  - Provides helper functions like `get_orders_df()`.
+- `src/db_client.py` – loads CSVs and initialises SQLite.
+- `src/sql_generator.py` – maps questions to SQL.
+- `src/sql_runner.py` – executes SQL against SQLite and returns rows.
+- `src/config.py` and `src/prompt_builder.py` – configuration and prompt logic.
+- `src/main.py` – FastAPI entrypoint and `/ask` endpoint orchestration.
+- `app/streamlit.py` – Streamlit UI and HTTP calls to the backend.
 
-- `sql_generator.py`  
-  - Contains the logic or prompt that maps natural‑language questions to SQL.  
-  - Handles date filters, group‑by, and simple aggregations.
+---
 
-- `sql_runner.py`  
-  - Opens a connection to `orders.db`.  
-  - Executes SQL safely and returns results as Python structures.
+## 7. Deployment
 
-- `backend/main.py`  
-  - Defines the FastAPI app, startup hook, and `/ask` endpoint.  
-  - Orchestrates generation, validation, execution, and response construction.
+This project has been deployed with:
 
-- `app/streamlit.py`  
-  - Implements the UI layout (two‑column top section, result card below).  
-  - Handles example questions, request/response flow, and chart logic.
+- **Backend**: FastAPI on Render (or similar PaaS)
+- **Frontend**: Streamlit on Render, configured to call the hosted backend
 
-## 6. Notes for deployment
+You can add your live URLs here:
 
-This first version is designed to run locally, but the repository layout and README are prepared so you can later:
+- Frontend: `https://<your-frontend>.onrender.com`
+- Backend: `https://<your-backend>.onrender.com`
 
-- deploy FastAPI behind a reverse proxy,
-- host the Streamlit app or convert it into another frontend stack,
-- or switch the SQLite database to a managed database service.
+The repo layout and configuration are kept simple so you can later:
+
+- put FastAPI behind a reverse proxy,
+- swap Streamlit for another frontend stack,
+- or move from SQLite to a managed relational database service [web:671][web:684].
