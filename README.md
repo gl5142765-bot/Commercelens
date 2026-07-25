@@ -285,5 +285,5 @@ You can add your live URLs here:
 The repo layout and configuration are kept simple so you can later:
 
 - put FastAPI behind a reverse proxy,
-- swap Streamlit for another frontend stack,
-- or move from SQLite to a managed relational database service [web:671][web:684].
+- swap Streamlit for another frontend stack.
+- or move from SQLite to a managed relational database service 
