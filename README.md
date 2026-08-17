@@ -5,6 +5,9 @@ It lets a business user ask questions in plain English about a fixed orders data
 
 ---
 
+- Frontend: `https://<your-frontend>.onrender.com`
+- Backend: `https://<your-backend>.onrender.com`
+
 ## 1. Quick overview
 
 ### 1.1 What Text‑to‑SQL means
@@ -277,10 +280,7 @@ This project has been deployed with:
 - **Backend**: FastAPI on Render (or similar PaaS)
 - **Frontend**: Streamlit on Render, configured to call the hosted backend
 
-You can add your live URLs here:
 
-- Frontend: `https://<your-frontend>.onrender.com`
-- Backend: `https://<your-backend>.onrender.com`
 
 The repo layout and configuration are kept simple so you can later:
 
