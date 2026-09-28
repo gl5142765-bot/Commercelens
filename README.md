@@ -5,8 +5,8 @@ It lets a business user ask questions in plain English about a fixed orders data
 
 ---
 
-- Frontend: `https://<your-frontend>.onrender.com`
-- Backend: `https://<your-backend>.onrender.com`
+- Frontend:https://commercelens-frontend.onrender.com/
+- Backend:https://commercelens-backend-1.onrender.com/
 
 ## 1. Quick overview
 
